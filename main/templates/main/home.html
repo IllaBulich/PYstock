@@ -1,0 +1,15 @@
+{% extends 'main/layout.html'%}
+{% block title %} {{title}} {% endblock %}
+
+{% load static %}
+{% block style %}
+<link rel="stylesheet"  href="{% static 'main/css/main.css'%}">
+
+{% endblock %}
+{% block body %}
+<div class="intro">
+    <h1 >Веб-склад</h1>
+    <p>Все что нужно — в одной системе:</p>
+    <a type="button" class="btn btn-primary me-2" href="{% url 'about'%}"> Начать работу</a>
+</div>
+{% endblock %}

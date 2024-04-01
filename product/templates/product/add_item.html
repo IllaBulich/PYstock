@@ -1,0 +1,61 @@
+{% extends 'main/layout.html'%}
+
+{% block title %} ВЕБ-СКЛАД {% endblock %}
+
+{% block container %}
+<div class="container mt-5 md-5">
+    <h1>Добавление</h1>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="inputPassword6" class="col-form-label">Продукт:</label>
+            </div>
+            <div class="col-auto">
+                {{form.product}}
+            </div>
+        </div>
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="inputPassword6" class="col-form-label">Склад:</label>
+            </div>
+            <div class="col-auto">
+                {{form.stock}}
+            </div>
+        </div>
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="inputPassword6" class="col-form-label">Количество:</label>
+            </div>
+            <div class="col-auto">
+                {{form.quantity}}
+            </div>
+        </div>
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="inputPassword6" class="col-form-label">Стоймость:</label>
+            </div>
+            <div class="col-auto">
+                {{form.purchase_price}}
+            </div>
+        </div>
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="inputPassword6" class="col-form-label">Дата поступления:</label>
+            </div>
+            <div class="col-auto">
+                {{form.purchase_date}}
+            </div>
+        </div>
+      
+          
+          
+        <span>{{error}}</span>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </form>
+
+</div>
+
+{% endblock %}

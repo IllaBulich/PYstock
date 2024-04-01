@@ -1,0 +1,37 @@
+{% extends 'main/layout.html'%}
+{% load static%}
+
+
+{% block title %} ВЕБ-СКЛАД {% endblock %}
+
+{% block container %}
+
+<main class="col-md-9  container">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div class="btn-group me-2">
+        <a href="/items/statistics?isActive=true"  class="h2">График затрат на закупки</a>
+            </div>
+        <div class="btn-group me-2">
+            <a href="/items/statistics?isActive=false" class="h2">График прибыли</a>
+        </div>
+    </div>
+    <div id="container"></div>
+    заебало
+  
+   
+    
+    
+</main>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+ 
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+   
+<!-- Вставка данных JSON внутри тега <script> -->
+    <script>
+        var chartsData = {{ charts_data|safe }};
+    </script>
+    
+    <!-- Здесь вы можете использовать переменную chartsData в JavaScript -->
+   
+    <script src="{% static 'analytics/js/line_chart.js' %}"></script>
+{% endblock %}

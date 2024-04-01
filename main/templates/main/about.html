@@ -1,0 +1,15 @@
+{% extends 'main/layout.html'%}
+{% block title %} about {% endblock %}
+
+
+{% block body %}
+<div class="intro">
+    <h1 >{{title}}</h1>
+    <p>Все что нужно — в одной системе:</p>
+    <a type="button" class="btn btn-primary me-2" href="{% url 'home'%}">вернутся home</a>
+    {% for el in values %}
+        <p>{{el}}</p>
+        
+    {% endfor%}
+</div>
+{% endblock %}
