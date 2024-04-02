@@ -1,6 +1,6 @@
 from django.db import models
 from warehouses.models import Stock
-
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Product(models.Model):
@@ -35,7 +35,7 @@ class Item(models.Model):
     sold = models.BooleanField('Сбыто', default = False)
     available = models.BooleanField('доступно', default = True)
     soldQuantity = models.IntegerField('Количество cбыто', default = 0)
-
+    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
 
     def get_current_amount(self):

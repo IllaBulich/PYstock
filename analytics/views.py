@@ -1,10 +1,11 @@
-from threading import local
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from product.models import Item
 from django.db.models import Sum,  F, ExpressionWrapper, FloatField
 import json
 from datetime import datetime, date
 
+@login_required
 def view_func(request):
    
     items = Item.objects.filter(sold=False)\

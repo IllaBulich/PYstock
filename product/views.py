@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Product,Item
 from .forms import ProductForm, ItemForm
 from django.views.generic import DetailView, DeleteView ,UpdateView
 from django.http import JsonResponse
 import json
 
-
+@login_required
 def delete_item(request, item_id):
     # Получаем объект Item или возвращаем ошибку 404, если он не найден
     item = get_object_or_404(Item, pk=item_id)
@@ -24,6 +26,8 @@ def delete_item(request, item_id):
     # Если запрос не POST, возвращаем какую-то другую страницу, или можете передать данные для отображения формы удаления
     return redirect('warehouses/main')
 
+
+@login_required
 def add_item(request):
     if request.method == 'POST':
         form = ItemForm(request.POST)
@@ -35,7 +39,7 @@ def add_item(request):
     return render(request, 'product/add_item.html', {'form': form})
 
 
-
+@login_required
 def salesItem(request):
     items = Item.objects.filter(available=True)
     if request.method == 'POST':
@@ -56,27 +60,31 @@ def salesItem(request):
 
     
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin,UpdateView):
     model = Product
     template_name = "product/add.html"
     
     form_class = ProductForm
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin,DeleteView):
     model = Product
     success_url = '/product'
     template_name = "product/delete.html"
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin,DetailView):
     model = Product
     template_name = "product/details_view.html"
     context_object_name = "product"
 
+
+@login_required
 def main(request):
     product = Product.objects.all()
     return render(request,'product/main.html',{'product':product})
 
+
+@login_required
 def add(request):
     error = ''
     if request.method == 'POST':

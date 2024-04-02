@@ -3,6 +3,7 @@
 
 
 {% block body %}
+<body>
 <div class="intro">
     <h1 >{{title}}</h1>
     <p>Все что нужно — в одной системе:</p>
@@ -12,4 +13,46 @@
         
     {% endfor%}
 </div>
+<div class="container mt-5 md-5" >
+    {% if form.errors %}
+      <p>Ваше имя пользователя и пароль не совпали. Пожалуйста, попробуйте еще раз.</p>
+    {% endif %}
+    
+    {% if next %}
+      {% if user.is_authenticated %}
+        <p>У вашей учетной записи нет доступа к этой странице. Продолжать,
+            пожалуйста, войдите в учетную запись, у которой есть доступ.</p>
+      {% else %}
+        <p>Пожалуйста, войдите, чтобы увидеть эту страницу.</p>
+      {% endif %}
+    {% endif %}
+    
+    <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">{{ form.username.label_tag }}</label>
+        </div>
+        <div class="col-auto">
+            {{form.username}}
+        </div>
+    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">{{ form.password.label_tag }}</label>
+        </div>
+        <div class="col-auto">
+            {{form.password}}
+        </div>
+    </div>
+    
+    
+    <input class="btn btn-success" type="submit" value="Авторизоваться" />
+    <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+    
+    {# Assumes you setup the password_reset view in your URLconf #}
+    <p><a href="{% url 'password_reset' %}">Забытый пароль?</a></p>
+    </div>
+</body>
 {% endblock %}
