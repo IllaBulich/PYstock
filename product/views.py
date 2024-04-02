@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django_filters.views import FilterView
+from .filters import ItemFilter
 from .models import Product,Item
 from .forms import ProductForm, ItemForm
 from django.views.generic import DetailView, DeleteView ,UpdateView
@@ -39,24 +41,47 @@ def add_item(request):
     return render(request, 'product/add_item.html', {'form': form})
 
 
-@login_required
-def salesItem(request):
-    items = Item.objects.filter(available=True)
-    if request.method == 'POST':
+class ItemListView(LoginRequiredMixin,FilterView):
+    model = Item
+    filterset_class = ItemFilter
+    template_name = 'product/sales_item.html'
+
+    def post(self, request):
         try:
             # Парсим JSON из тела запроса
             data = json.loads(request.body)
             # Выводим полученные данные в консоль
             print("Received data in salesItem:", data)
-            for item in data:
-               
-                print(Item.createSaleItem(item))
+            for item_data in data:
+                # Вместо вызова Item.createSaleItem(item_data) предполагается, что
+                # у вас есть метод createSaleItem в модели Item или менеджере модели
+                print(Item.createSaleItem(item_data))
             # Возвращаем ответ об успешной обработке
             return redirect('warehouses/main')
         except json.JSONDecodeError:
             # Если возникла ошибка при разборе JSON, возвращаем сообщение об ошибке
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-    return render(request,'product/sales_item.html',{'items':items,})
+
+
+
+# @login_required
+# def salesItem(request):
+#     items = Item.objects.filter(available=True)
+#     if request.method == 'POST':
+#         try:
+#             # Парсим JSON из тела запроса
+#             data = json.loads(request.body)
+#             # Выводим полученные данные в консоль
+#             print("Received data in salesItem:", data)
+#             for item in data:
+               
+#                 print(Item.createSaleItem(item))
+#             # Возвращаем ответ об успешной обработке
+#             return redirect('warehouses/main')
+#         except json.JSONDecodeError:
+#             # Если возникла ошибка при разборе JSON, возвращаем сообщение об ошибке
+#             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+#     return render(request,'product/sales_item.html',{'items':items,})
 
     
 

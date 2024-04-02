@@ -6,44 +6,58 @@
 
 {% block container %}
 <div class="container mt-5">
-   
-        {% csrf_token %}
-        <h1>Продукты на складе</h1>
-        <table class="table table-info table-striped table-bordered">
-            <thead>
-            <tr>
-                <th scope="col">Название</th>
-                <th scope="col">Описание</th>
-                <th scope="col">Стоймасть закупки</th>
-                <th scope="col">Артикул</th>
-                <th scope="col">Склад</th>
-                <th scope="col">На складе</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-            </tr>
-            </thead>
-            <tbody id="table-body">
-            {% for el in items%}
-            <tr data-item-id="{{ el.id }}">
-                <th>{{el.product.name}}</th>
-                <th>{{el.product.description}}</th>
-                <th>{{el.purchase_price}}</th>
-                <th>{{el.product.vendor_code}}</th>
-                <th>{{el.get_current_amount}}</th>
-                <th>{{el.stock.title}}</th>
-                <td><input type="number" name="quantity_{{ el.id }}" min="0" value="0"></td>
-                <td><input type="number" name="cost_{{ el.id }}" min="0" step="0.01" value="0.00"></td>
-                
-            </tr>
-            {% endfor%}
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col-3">
+            
+            <form method="get">
+                {{ filter.form.as_p }}
+                <button type="submit" class="btn btn-outline-secondary">Применить фильтр</button>
+            </form>
+        </div>
+        <div class="col-9">
+            {% csrf_token %}
+            <h1>Продукты на складе</h1>
+            <table class="table table-info table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Название</th>
+                    <th scope="col">Дата поступления</th>
+                    <th scope="col">Стоймасть закупки</th>
+                    <th scope="col">Артикул</th>
+                    <th scope="col">Склад</th>
+                    <th scope="col">На складе</th>
+                    <th scope="col">Количество для отгрузки </th>
+                    <th scope="col">Стоймость ед.</th>
+                </tr>
+                </thead>
+                <tbody id="table-body">
+                {% for el in filter.qs%}
+                <tr data-item-id="{{ el.id }}">
+                    <th>{{el.product.name}}</th>
+                    <th>{{el.purchase_date}}</th>
+                    <th>{{el.purchase_price}}</th>
+                    <th>{{el.product.vendor_code}}</th>
+                    <th>{{el.stock.title}}</th>
+                    <th>{{el.get_current_amount}}</th>
+                    <td><input type="number"  class="form-control"  name="quantity_{{ el.id }}" min="0" value="0"></td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control"  name="cost_{{ el.id }}" min="0" step="0.01" value="0.00">
+                        </div>
+                    </td>
+                    
+                </tr>
+                {% endfor%}
+                </tbody>
+            </table>
         
-        <button id="submitData" class="btn btn-primary btn-lg">Выполнить отгрузку</button>
-    
+            <button id="submitData" class="btn btn-primary btn-lg">Выполнить отгрузку</button>
+        </div>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="{% static 'product/js/script.js' %}"></script>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'product/js/script.js' %}"></script>
 
 
 {% endblock %}
