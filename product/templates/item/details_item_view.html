@@ -1,0 +1,43 @@
+{% extends 'main/layout.html'%}
+
+{% block title %} ВЕБ-СКЛАД {% endblock %}
+
+{% block container %}
+<div class="container mt-5">
+
+    <h1>{{item.product.name}}</h1><br>
+
+    <div class="row g-5 mt-2">
+        <div class="col-md-6">
+            <ul class="icon-list ps-0">
+                <li class="row mb-1">
+                    <div class="col"><b>Артикул: </b></div>
+                    <div class="col"><p>{{item.product.vendor_code}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Помещяется на один стелаж: </b></div>
+                    <div class="col"><p>{{item.product.quantity_rack}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Количество: </b></div>
+                    <div class="col"><p>{{item.get_current_amount}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Стоймасть закупки: </b></div>
+                    <div class="col"><p>{{item.purchase_price}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Дата поступления: </b></div>
+                    <div class="col"><p>{{item.purchase_date}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Количество cбыто: </b></div>
+                    <div class="col"><p>{{item.soldQuantity}}</p></div>
+                </li>
+            
+            </ul>
+            <div><h4>Описание: </h4><p>{{item.product.description}}</p></div>
+        </div>
+       
+</div>
+{% endblock %}

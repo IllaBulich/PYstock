@@ -55,4 +55,41 @@
     <p><a href="{% url 'password_reset' %}">Забытый пароль?</a></p>
     </div>
 </body>
+
+<form action="{%  url 'product/delete_item' el.id %}" method="post">
+    <!-- Кнопка для открытия модального окна -->
+    <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#myModal{{el.id}}">
+        Удалить
+    </button>
+
+    <!-- Модальное окно -->
+    <div class="modal fade" id="myModal{{el.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="${el.getProduct().name}"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label>
+                        <p>Введите количество для удаления  </p>
+                        <input type="number"  min="0" max="{{el.get_current_amount}}" value="0" class="form-control" name="quantityDelete"   required>
+                        {% csrf_token %}
+                    </label>
+                    <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 {% endblock %}

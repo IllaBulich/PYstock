@@ -35,6 +35,9 @@ def stock_detail(request, id):
 @login_required
 def main(request):
     stock = Stock.objects.all()
+    for el in stock:
+        lol = el.calculation_occupancy_status()
+        print("el =",lol)
     return render(request,'warehouses/main.html',{'stock':stock})
 
 @login_required

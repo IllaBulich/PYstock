@@ -41,6 +41,9 @@ class Item(models.Model):
     def get_current_amount(self):
         return self.quantity - self.soldQuantity
     
+    def calculation_quantity_rack(self):
+        return self.get_current_amount() / self.product.quantity_rack
+    
     def get_absolute_url(self):
         return f'/product/item/{self.id}'
     
