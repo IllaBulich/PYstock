@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'product',
     'analytics',
     'googlecharts',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

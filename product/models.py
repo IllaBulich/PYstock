@@ -48,7 +48,7 @@ class Item(models.Model):
         return f'/product/item/{self.id}'
     
     def __str__(self):
-        return f"{self.product} - {self.stock} - {self.quantity} - {self.purchase_price} - {self.sales_price} - {self.purchase_date} - {self.sales_date} - {self.sold}  - {self.available} - {self.soldQuantity}"
+        return f"{self.product} - {self.stock} - {self.quantity} - {self.purchase_price} - {self.sales_price} - {self.purchase_date} - {self.sales_date} - sold= {self.sold}  - available= {self.available} - {self.soldQuantity} - {self.responsible}"
     
     @classmethod
     def createSaleItem(cls, item_data):

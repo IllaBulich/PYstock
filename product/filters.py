@@ -48,7 +48,3 @@ class ItemFilter(FilterSet):
             # Добавьте остальные поля, по которым хотите фильтровать
         }
         
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.queryset = self.queryset.filter(available=True)

@@ -1,0 +1,38 @@
+{% extends 'main/layout.html'%}
+{% load static%}
+
+
+{% block title %} ВЕБ-СКЛАД {% endblock %}
+
+{% block container %}
+
+<div id="container" ></div>
+не понял
+<script src="https://code.highcharts.com/highcharts.js"></script>
+ 
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>    
+    <script>
+        console.log("forecast_values=", {{forecast_values}})
+        
+        Highcharts.chart('container', {
+            title: {
+                text: 'Прогнозирование спроса'
+            },
+            xAxis: {
+                
+                categories: {{ forecast_dates | safe }},
+                
+            },
+            yAxis: {
+                title: {
+                    text: 'Количество едениц'
+                }
+            },
+            series: [{
+                name: 'Спрос',
+                data: [{% for value in forecast_values %}{{ value }}, {% endfor %}]
+            }]
+        });
+    </script>
+    
+{% endblock %}
