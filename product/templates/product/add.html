@@ -15,10 +15,7 @@
     <br>
     <form method="post">
         {% csrf_token %}
-        {{form.name}}<br>
-        {{form.description}}<br>
-        {{form.vendor_code}}<br>
-        {{form.quantity_rack}}<br>
+        {{ form.as_p }}
         <button type="submit" class="btn btn-success">Сохранить</button>
     </form>
 

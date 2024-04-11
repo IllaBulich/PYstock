@@ -8,11 +8,7 @@
     <br>
     <form method="post">
         {% csrf_token %}
-        {{form.title}}<br>
-        {{form.city}}<br>
-        {{form.street}}<br>
-        {{form.address}}<br>
-        {{form.number_racks}}<br>
+        {{ form.as_p }}
         <span>{{error}}</span>
         <button type="submit" class="btn btn-success">Сохранить</button>
     </form>

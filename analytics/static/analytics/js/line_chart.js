@@ -8,7 +8,7 @@ Highcharts.chart('container_1', {
 
     yAxis: {
         title: {
-            text: 'Общяя стоймасть закупак'
+            text: 'Общяя стоймасть закупак (BYN)'
         }
     },
 

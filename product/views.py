@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
 from .filters import ItemFilter
@@ -8,6 +8,7 @@ from .forms import ProductForm, ItemForm
 from django.views.generic import DetailView, DeleteView, UpdateView,  ListView, CreateView
 from django.http import JsonResponse
 import json
+from django.http import HttpResponseRedirect
 
 # 
 class AddItemView(LoginRequiredMixin, CreateView):
@@ -61,9 +62,10 @@ class ItemListView(LoginRequiredMixin,FilterView):
             # Выводим полученные данные в консоль
             print("Received data in salesItem:", data)
             for item_data in data:
+               
                 # Вместо вызова Item.createSaleItem(item_data) предполагается, что
                 # у вас есть метод createSaleItem в модели Item или менеджере модели
-                print(Item.createSaleItem(item_data))
+                print(Item.createSaleItem(item_data,self.request.user))
             # Возвращаем ответ об успешной обработке
             return redirect('warehouses/main')
         except json.JSONDecodeError:
@@ -101,3 +103,14 @@ class AddProductView(LoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'product/add.html'
+
+    def get_success_url(self):
+        # Получаем параметр 'next' из запроса
+        next_url = self.request.GET.get('next')
+
+        # Если параметр 'next' существует, возвращаем его значение
+        if next_url:
+            return next_url
+        
+        # Если параметр 'next' отсутствует, возвращаем URL по умолчанию
+        return reverse('product/main')

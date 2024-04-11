@@ -51,7 +51,7 @@ class Item(models.Model):
         return f"{self.product} - {self.stock} - {self.quantity} - {self.purchase_price} - {self.sales_price} - {self.purchase_date} - {self.sales_date} - sold= {self.sold}  - available= {self.available} - {self.soldQuantity} - {self.responsible}"
     
     @classmethod
-    def createSaleItem(cls, item_data):
+    def createSaleItem(cls, item_data, user):
         
         item = cls.objects.get(id=item_data['id'])
         if item.soldQuantity + item_data['quantity'] > item.quantity: 
@@ -74,6 +74,7 @@ class Item(models.Model):
         saleItem.sold = True
         saleItem.available = False
         item.save()
+        saleItem.responsible = user
         saleItem.save()
         
         print('item', item)

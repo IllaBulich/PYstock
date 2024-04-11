@@ -6,44 +6,48 @@
     <div class="bg-body-tertiary p-5 rounded">
         <div class="col-sm-8 py-5 mx-auto">
           
-      
-{% if form.errors %}
-  <p>Ваше имя пользователя и пароль не совпали. Пожалуйста, попробуйте еще раз.</p>
-{% endif %}
+        {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <p>Ваше имя пользователя и пароль не совпали. Пожалуйста, попробуйте еще раз.</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+            
+        {% endif %}      
+
 
 {% if next %}
   {% if user.is_authenticated %}
-    <p>У вашей учетной записи нет доступа к этой странице. Продолжать,
-        пожалуйста, войдите в учетную запись, у которой есть доступ.</p>
+    <h2>У вашей учетной записи нет доступа к этой странице. Продолжать,
+        пожалуйста, войдите в учетную запись, у которой есть доступ.</h2>
   {% else %}
-    <p>Пожалуйста, войдите, чтобы увидеть эту страницу.</p>
+    <h2>Пожалуйста, войдите, чтобы увидеть эту страницу.</h2>
   {% endif %}
 {% endif %}
 
 <form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-<div class="row g-3 align-items-center">
-    <div class="row">
-        <div class="col-3">
-            <label class="col-form-label">{{ form.username.label_tag }}</label>
+    {% csrf_token %}
+    <div class="row g-3 align-items-center">
+        <div class="row">
+            <div class="col-3">
+                <label class="col-form-label">{{ form.username.label_tag }}</label>
+            </div>
+            <div class="col-4">
+                {{form.username}}
+            </div>
         </div>
-        <div class="col-auto">
-            {{form.username}}
+        <div class="row">
+            <div class="col-3">
+                <label class="col-form-label">{{ form.password.label_tag }}</label>
+            </div>
+            <div class="col-4">
+                {{form.password}}
+            </div>
         </div>
     </div>
-    <div class="row">
-    <div class="col-3">
-        <label class="col-form-label">{{ form.password.label_tag }}</label>
-    </div>
-    <div class="col-auto">
-        {{form.password}}
-    </div>
-</div>
-</div>
 
 
-<input class="btn btn-success" type="submit" value="Авторизоваться" />
-<input type="hidden" name="next" value="{{ next }}" />
+    <input class="btn btn-success" type="submit" value="Авторизоваться" />
+    <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
 {# Assumes you setup the password_reset view in your URLconf #}
