@@ -8,8 +8,36 @@ from .forms import ProductForm, ItemForm
 from django.views.generic import DetailView, DeleteView, UpdateView,  ListView, CreateView
 from django.http import JsonResponse
 import json
-from django.http import HttpResponseRedirect
+import qrcode
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 
+def generate_qr_code(request, item_id):
+    # Получаем объект модели Item
+    item = get_object_or_404(Item, pk=item_id)
+
+    # Создаем URL-адрес страницы деталей объекта модели Item
+    item_detail_url = request.build_absolute_uri(reverse('item/item_detail', kwargs={'pk': item_id}))
+
+    # Создание объекта QRCode
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+
+    # Добавление URL-адреса в объект QRCode
+    qr.add_data(item_detail_url)
+    qr.make(fit=True)
+
+    # Создание изображения QR-кода
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+
+    # Создание HTTP-ответа с изображением QR-кода
+    response = HttpResponse(content_type="image/png")
+    qr_img.save(response, "PNG")
+    return response
 # 
 class AddItemView(LoginRequiredMixin, CreateView):
     model = Item

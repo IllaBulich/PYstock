@@ -26,10 +26,10 @@ def demand_forecast(request):
     df = pd.DataFrame(data)
     df['sales_date'] = pd.to_datetime(df['sales_date'])
     df = df.set_index('sales_date')
-    
     # Ресемплирование данных с ежедневной периодичностью и заполнение недостающих дней нулями
     df = df.resample('D').sum().fillna(0)
     
+    print('df',df)
     # Прогнозирование спроса
     model = ARIMA(df['total_sales'], order=(5,1,0))
     results = model.fit()
@@ -68,28 +68,50 @@ class FuncView(LoginRequiredMixin, FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         queryset = self.get_queryset()
-        print('queryset', queryset)
-        items1 = (
+        
+        items = (
             queryset.filter(sold=False)
             .values('purchase_date')
-            .annotate(received=ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField()))
-            .annotate(remainder=ExpressionWrapper((F('quantity') - F('soldQuantity')) * F('purchase_price'), output_field=FloatField()))
+            .annotate(
+                received_price=Sum(ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField())),
+                remainder_price=Sum(ExpressionWrapper((F('quantity') - F('soldQuantity')) * F('purchase_price'), output_field=FloatField())),
+                received=Sum(F('quantity')),
+                remainder=Sum(F('quantity') - F('soldQuantity'))
+            )
             .order_by('purchase_date')
         )
+        
+        # Обработка и подготовка данных
+        data = {'dades_list': [], 'all_received_price_list': [], 'all_remainder_price_list': [], 'all_received_list': [], 'all_remainder_list': []}
+        for item in items:
+        
+            data['dades_list'].append(item['purchase_date'])
+            data['all_received_price_list'].append(item['received_price'])
+            data['all_remainder_price_list'].append(item['remainder_price'])
+            data['all_received_list'].append(item['received'])
+            data['all_remainder_list'].append(item['remainder'])
 
-        cost_chart = line_chart(items1)
-        charts_data = {'cost_chart': cost_chart}
+        
+        df = pd.DataFrame(data)
+        df['dades_list'] = pd.to_datetime(df['dades_list'])
+        df = df.set_index('dades_list')
+        print('df',df)
+        # Преобразование DataFrame в списки
+        dades_list = df.index.tolist()
 
-        items2 = (
-            queryset.filter(sold=False)
-            .values('purchase_date')
-            .annotate(received=F('quantity'))
-            .annotate(remainder=F('quantity') - F('soldQuantity'))
-            .order_by('purchase_date')
-        )
-
-        quantity_chart = line_chart(items2)
-        charts_data['quantity_chart'] = quantity_chart
+        charts_data = dict()
+        charts_data['cost_chart'] = dict()
+        charts_data['cost_chart']['dades_list'] = dades_list
+        charts_data['cost_chart']['series'] = [
+            {'name': 'Поступления в (BYN)', 'data': df['all_received_price_list'].tolist()},
+            {'name': 'Осталось в (BYN)', 'data': df['all_remainder_price_list'].tolist()},
+        ]
+        charts_data['quantity_chart'] = dict()
+        charts_data['quantity_chart']['dades_list'] = dades_list
+        charts_data['quantity_chart']['series'] = [
+            {'name': 'Поступления', 'data': df['all_received_list'].tolist()},
+            {'name': 'Осталось', 'data': df['all_remainder_list'].tolist()},
+        ]
 
         def custom_serializer(obj):
             if isinstance(obj, (datetime, date)):
@@ -100,87 +122,3 @@ class FuncView(LoginRequiredMixin, FilterView):
 
         context['charts_data'] = json_charts_data
         return context
-
-
-
-def view_func(request):
- 
-    items1 = (
-        Item.objects.filter(sold=False)
-        .values('purchase_date')
-        .annotate(received=ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField()))
-        .annotate(remainder = ExpressionWrapper(  (F('quantity')-F('soldQuantity'))* F('purchase_price'), output_field=FloatField()) )
-        .order_by('purchase_date')
-        )
-
-    cost_chart = line_chart(items1)
-    charts_data = dict()
-    charts_data['cost_chart'] = cost_chart
-
-    items2 = (
-        Item.objects.filter(sold=False)
-        .values('purchase_date')
-        .annotate(received=F('quantity') )
-        .annotate(remainder =  F('quantity')-F('soldQuantity') )
-        .order_by('purchase_date')
-        )
-   
-
-    quantity_chart = line_chart(items2)
-   
-    charts_data['quantity_chart'] = quantity_chart
-
-    def custom_serializer(obj):
-        if isinstance(obj, (datetime,date)):
-            serial = obj.isoformat()
-            return serial
-
-    json_charts_data = json.dumps(charts_data,  default=custom_serializer)
-
-    print('charts_data= ',charts_data)
-
-    return render(request, 'analytics/main.html', {'charts_data': json_charts_data})
-
-
-def line_chart(model_list):
-    dades_list = list()
-    all_received_dict = dict()
-    all_remainder_dict = dict()
-
-    for model in model_list:
-        if not model['purchase_date'] in dades_list:
-            dades_list.append(model['purchase_date'])
-        
-        if model['purchase_date'] in all_received_dict:
-            all_received_dict[model['purchase_date']] += model['received']
-        else:
-            all_received_dict[model['purchase_date']] = model['received']
-
-        if model['purchase_date'] in all_remainder_dict:
-            all_remainder_dict[model['purchase_date']] += model['remainder']
-        else:
-            all_remainder_dict[model['purchase_date']] = model['remainder']
-
-
-    all_received_list = list()
-    all_remainder_list = list()
-    for dates in dades_list:
-        if dates in all_received_dict:
-            all_received_list.append(all_received_dict[dates])
-        else:
-            all_received_list.append(0)
-
-        if dates in all_remainder_dict:
-            all_remainder_list.append(all_remainder_dict[dates])
-        else:
-            all_remainder_list.append(0)
-
-
-    charts_data = dict()
-    charts_data['dades_list'] = dades_list
-    charts_data['series'] = [
-        {'name':'Поступления', 'data': all_received_list},
-        {'name':'Осталось', 'data': all_remainder_list},
-        ]
-    
-    return charts_data

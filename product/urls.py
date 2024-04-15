@@ -14,6 +14,7 @@ urlpatterns = [
     path('sales_item', views.ItemListView.as_view(), name='item/sales_item'),
     path('item/<int:pk>', views.ItemDetailView.as_view(), name = "item/item_detail"),
     path('item/<int:pk>/update', views.ItemUpdateView.as_view(), name = "item/item_update"),
+    path('generate_qr_code/<int:item_id>/', views.generate_qr_code, name='generate_qr_code'),
    
 
 ]
