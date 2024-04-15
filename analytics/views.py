@@ -192,3 +192,97 @@ class FuncView(LoginRequiredMixin, FilterView):
 
         context['charts_data'] = json_charts_data
         return context
+
+
+class MixedView(LoginRequiredMixin, FilterView):
+    model = Item
+    filterset_class = ItemFilter
+    template_name = 'analytics/mixed.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()  # Получите исходный queryset
+
+        # Примените фильтр, если он был отправлен в запросе
+        self.filterset = ItemFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs  # Верните отфильтрованный queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        
+        items1 = (
+            queryset.filter(sold=True)
+            .values('sales_date')
+            .annotate(
+                sales_total_price=Sum(ExpressionWrapper(F('quantity') * F('sales_price'), output_field=FloatField())),
+                sales_total_quantity=Sum(F('quantity')),
+                
+            )
+            .order_by('sales_date')
+        )
+        items2 = (
+            queryset.filter(sold=False)
+            .values('purchase_date')
+            .annotate(
+                received_total_price=Sum(ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField())),
+                received_total_quantity =Sum(F('quantity')),
+            )
+            .order_by('purchase_date')
+        )
+        
+        # Обработка и подготовка данных
+        data1 = {'date_list': [], 'all_sales_total_price_list': [], 'all_sales_total_quantity_list': []}
+        for item in items1:
+        
+            data1['date_list'].append(item['sales_date'])
+            data1['all_sales_total_price_list'].append(item['sales_total_price'])
+            data1['all_sales_total_quantity_list'].append(item['sales_total_quantity'])
+
+        data2 = {'date_list': [], 'all_received_total_price_list': [], 'all_received_total_quantity_list': []}
+        for item in items2:
+        
+            data2['date_list'].append(item['purchase_date'])
+            data2['all_received_total_price_list'].append(item['received_total_price'])
+            data2['all_received_total_quantity_list'].append(item['received_total_quantity'])
+
+        # Создание DataFrame
+        df1 = pd.DataFrame(data1)
+        df2 = pd.DataFrame(data2)
+
+        # Объединение по столбцу с датой
+        merged_df = pd.merge(df1, df2, on='date_list', how='outer')
+        
+        merged_df['date_list'] = pd.to_datetime(merged_df['date_list'])
+        merged_df['date_list'] = merged_df['date_list'].dt.date
+        merged_df = merged_df.set_index('date_list')
+        
+        # merged_df = merged_df.resample('D').sum().fillna(0)
+        # print('merged_df2',merged_df)
+        # Преобразование DataFrame в списки
+        sales_date_list = merged_df.index.tolist()
+        print('sales_date_list',sales_date_list)
+        charts_data = dict()
+        charts_data['cost_chart'] = dict()
+        charts_data['cost_chart']['dades_list'] = sales_date_list
+        charts_data['cost_chart']['series'] = [
+            {'name': 'Сбыто в (BYN)', 'data': merged_df['all_sales_total_price_list'].tolist()},
+            {'name': 'Поступило в (BYN)', 'data': merged_df['all_received_total_price_list'].tolist()},
+           
+        ]
+        charts_data['quantity_chart'] = dict()
+        charts_data['quantity_chart']['dades_list'] = sales_date_list
+        charts_data['quantity_chart']['series'] = [
+            {'name': 'Сбыто', 'data': merged_df['all_sales_total_quantity_list'].tolist()},
+            {'name': 'Поступило', 'data': merged_df['all_received_total_quantity_list'].tolist()},
+            
+        ]
+
+        def custom_serializer(obj):
+            if isinstance(obj, (datetime, date)):
+                serial = obj.isoformat()
+                return serial
+
+        json_charts_data = json.dumps(charts_data, default=custom_serializer)
+
+        context['charts_data'] = json_charts_data
+        return context

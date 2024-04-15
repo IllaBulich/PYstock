@@ -1,14 +1,13 @@
-
 Highcharts.chart('container_1', {
 
     title: {
-        text: 'Статистика сбыта',
+        text: 'Статистика поступления и сбыта',
         
     },
 
     yAxis: {
         title: {
-            text: 'Общяя стоймасть закупак (BYN)'
+            text: 'Общий обём в (BYN)'
         }
     },
 
@@ -30,16 +29,17 @@ Highcharts.chart('container_1', {
 
 
 });
+
 Highcharts.chart('container_2', {
 
     title: {
-        text: 'Статистика поступленей',
+        text: 'Статистика поступления и сбыта',
         
     },
 
     yAxis: {
         title: {
-            text: 'Общяя количество'
+            text: 'Общий обём в шт.'
         }
     },
 
