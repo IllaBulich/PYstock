@@ -17,16 +17,17 @@
         <div class="col-9">
             {% csrf_token %}
             <h1>Продукты на складе</h1>
-            <table class="table table-info table-striped table-bordered">
+            <div class="table-responsive-xxl">
+            <table class="table table-info table-striped table-bordered table-sm">
                 <thead>
                 <tr>
                     <th scope="col">Название</th>
-                    <th scope="col">Дата поступления</th>
-                    <th scope="col">Стоймасть закупки (BYN)</th>
-                    <th scope="col">Артикул</th>
                     <th scope="col">Склад</th>
-                    <th scope="col">На складе</th>
-                    <th scope="col">Количество для отгрузки </th>
+                    <th scope="col">Дата поступления</th>
+                    <th scope="col">Артикул</th>
+                    <th scope="col">Кол. на складе</th>
+                    <th scope="col">Кол. для отгрузки </th>
+                    <th scope="col">Стоймасть закупки (BYN)</th>
                     <th scope="col">Стоймость ед. (BYN)</th>
                 </tr>
                 </thead>
@@ -34,15 +35,17 @@
                 {% for el in filter.qs%}
                 <tr data-item-id="{{ el.id }}">
                     <th>{{el.product.name}}</th>
-                    <th>{{el.purchase_date}}</th>
-                    <th>{{el.purchase_price}}</th>
-                    <th>{{el.product.vendor_code}}</th>
                     <th>{{el.stock.title}}</th>
+                    <th>{{el.purchase_date}}</th>
+                    
+                    <th>{{el.product.vendor_code}}</th>
+                    
                     <th>{{el.get_current_amount}}</th>
                     <td><input type="number"  class="form-control"  name="quantity_{{ el.id }}" min="0" value="0"></td>
-                    <td>
+                    <th>{{el.purchase_price}}</th>
+                    <td >
                         <div class="input-group mb-3">
-                            <span class="input-group-text">$</span>
+                            <span class="input-group-text">Br</span>
                             <input type="number" class="form-control"  name="cost_{{ el.id }}" min="0" step="0.01" value="0.00">
                         </div>
                     </td>
@@ -51,8 +54,14 @@
                 {% endfor%}
                 </tbody>
             </table>
-        
-            <button id="submitData" class="btn btn-primary btn-lg">Выполнить отгрузку</button>
+        </div>
+            <div class="row">
+                <div class="col-4"><button id="submitData" class="btn btn-primary btn-lg">Выполнить отгрузку</button></div>
+                <div class="col-2"><h6>Дата отгрузки:</h6></div>
+                <div class="col-3"><input type="date" name="date" class="form-control" id="id_date"></div>
+                
+                
+            </div>
         </div>
     </div>
 </div>

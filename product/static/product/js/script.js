@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function sendDataToServer() {
         const rows = document.querySelectorAll('table tbody tr');
+        const date = document.getElementById('id_date');
+        const selectedDate = date.value;
         const data = [];
 
         rows.forEach(row => {
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (quantity !== 0) {
                 // Создание словаря и добавление его в массив
-                data.push({ id, quantity, cost });
+                data.push({ id, quantity, cost, selectedDate });
             }
         });
 

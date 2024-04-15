@@ -1,7 +1,7 @@
-from django_filters import FilterSet, DateFilter, ModelChoiceFilter
+from django_filters import FilterSet, DateFilter, ModelChoiceFilter, CharFilter
 from .models import Item, Product
 from warehouses.models import Stock
-from django.forms import DateInput,Select
+from django.forms import DateInput,Select,TextInput
 
 class ItemFilter(FilterSet):
     purchase_date = DateFilter(
@@ -38,6 +38,15 @@ class ItemFilter(FilterSet):
                 'class': 'form-select',
             }),
     )
+    vendor_code = CharFilter(label='Артикул',
+        field_name='product__vendor_code', 
+        lookup_expr='icontains',
+        widget= TextInput(attrs = {
+                'class': 'form-control',
+                'placeholder':"Артикул"
+            })
+    )
+    
 
 
     class Meta:

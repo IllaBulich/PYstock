@@ -1,0 +1,39 @@
+{% extends 'main/layout.html'%}
+{% load static%}
+
+
+{% block title %} ВЕБ-СКЛАД {% endblock %}
+
+{% block container %}
+
+<div class="container mt-5">
+    <div class="row">
+    <div class="col-3">
+    
+        <form method="get">
+            {{ filter.form.as_p }}
+            <button type="submit" class="btn btn-outline-secondary">Применить фильтр</button>
+        </form>
+    </div>
+    <div class="col-9">
+        <div id="container_3"></div>
+        <div id="container_4"></div>
+    </div>
+
+   
+    
+    
+</div>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+ 
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+   
+<!-- Вставка данных JSON внутри тега <script> -->
+    <script>
+        var chartsData = {{ charts_data|safe }};
+    </script>
+    
+    <!-- Здесь вы можете использовать переменную chartsData в JavaScript -->
+   
+    <script src="{% static 'analytics/js/line_chart_sales.js' %}"></script>
+{% endblock %}

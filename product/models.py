@@ -68,11 +68,15 @@ class Item(models.Model):
         saleItem.purchase_date = item.purchase_date
         saleItem.sales_price = item_data['cost']
 
-        current_date = timezone.now().date()
-        saleItem.sales_date = current_date
+        if (not item_data['selectedDate']):
+            current_date = timezone.now().date()
+            saleItem.sales_date = current_date
+        else:
+            saleItem.sales_date = item_data['selectedDate']
 
         saleItem.sold = True
         saleItem.available = False
+        item.stock.calculation_occupancy_status()
         item.save()
         saleItem.responsible = user
         saleItem.save()

@@ -18,7 +18,6 @@ class Stock(models.Model):
     def calculation_occupancy_status(self):
         self.occupancy_status = sum(item.calculation_quantity_rack() for item in self.item_set.filter(available=True))
         self.save()
-        print('occupancy_status =',self.occupancy_status)
         return self.occupancy_status
 
     class Meta:
