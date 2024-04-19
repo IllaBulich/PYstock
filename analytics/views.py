@@ -10,57 +10,14 @@ from datetime import datetime, date
 from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 
-def demand_forecast(request):
-    # Получаем данные для прогнозирования спроса
-    items = Item.objects.filter(sold=True).values('sales_date').annotate(total_sales=Sum('quantity')).order_by('sales_date')
 
-    print('items',items)
-    
-    # Обработка и подготовка данных
-    data = {'sales_date': [], 'total_sales': []}
-    for item in items:
-       
-        data['sales_date'].append(item['sales_date'])
-        data['total_sales'].append(item['total_sales'])
-    
-    df = pd.DataFrame(data)
-    df['sales_date'] = pd.to_datetime(df['sales_date'])
-    df = df.set_index('sales_date')
-    # Ресемплирование данных с ежедневной периодичностью и заполнение недостающих дней нулями
-    df = df.resample('D').sum().fillna(0)
-    
-    print('df',df)
-    # Прогнозирование спроса
-    model = ARIMA(df['total_sales'], order=(5,1,0))
-    results = model.fit()
-    # Генерируем даты для прогноза на 12 месяцев вперед
-    forecast_dates = pd.date_range(start=df.index[-1], periods=31, freq='D')[1:]
-
-    # Прогнозируем спрос
-    forecast_values = results.forecast(steps=30)
-    # Округляем прогнозируемые значения до целых чисел
-    forecast_values_rounded = forecast_values.round().astype(int)
-
-    # Преобразуем индекс в список строковых представлений дат
-    forecast_dates_str = forecast_dates.strftime('%Y-%m-%d').tolist()
-
-    # Передача данных в шаблон
-    context = {
-        'forecast_dates': forecast_dates_str,
-        'forecast_values': forecast_values_rounded.tolist(),
-    }
-    print('context',context)
-    
-    return render(request, 'analytics/demand_forecast.html', context)
-
-class SalesView(LoginRequiredMixin, FilterView):
+class DemandForecastView(LoginRequiredMixin, FilterView):
     model = Item
     filterset_class = ItemFilter
-    template_name = 'analytics/sales.html'
+    template_name = 'analytics/demand_forecast.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()  # Получите исходный queryset
-
         # Примените фильтр, если он был отправлен в запросе
         self.filterset = ItemFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs  # Верните отфильтрованный queryset
@@ -74,6 +31,84 @@ class SalesView(LoginRequiredMixin, FilterView):
             .values('sales_date')
             .annotate(
                 total_price=Sum(ExpressionWrapper(F('quantity') * F('sales_price'), output_field=FloatField())),
+                total_profit=Sum(ExpressionWrapper(F('quantity') * (F('sales_price') - F('purchase_price')), output_field=FloatField())),
+                total_quantity=Sum(F('quantity')),
+            )
+            .order_by('sales_date')
+        )
+        
+         # Обработка и подготовка данных
+        data = {'sales_date': [], 'total_quantity': []} #, 'total_profit': [], 'total_price': [], }
+        for item in items:
+       
+            data['sales_date'].append(item['sales_date'])
+            data['total_quantity'].append(item['total_quantity'])
+            # data['total_profit'].append(item['total_profit'])
+            # data['total_price'].append(item['total_price'])
+    
+        df = pd.DataFrame(data)
+        df['sales_date'] = pd.to_datetime(df['sales_date'])
+        df = df.set_index('sales_date')
+        # Ресемплирование данных с ежедневной периодичностью и заполнение недостающих дней нулями
+        df = df.resample('D').sum().fillna(0)
+        
+        print('df',df)
+        # Прогнозирование спроса
+        model = ARIMA(df['total_quantity'], order=(5,1,0))
+        results = model.fit()
+    
+        forecast_dates = pd.date_range(start=df.index[-1], periods=31, freq='D')[1:]
+
+        # Прогнозируем спрос
+        forecast_values = results.forecast(steps=30)
+        # Округляем прогнозируемые значения до целых чисел
+        forecast_values_rounded = forecast_values.round().astype(int)
+
+        # Преобразуем индекс в список строковых представлений дат
+        forecast_dates_str = forecast_dates.strftime('%Y-%m-%d').tolist()
+
+        sales_date_list = df.index.tolist()
+        print('sales_date_list',sales_date_list)
+        charts_data = dict()
+        charts_data['cost_chart'] = dict()
+        charts_data['cost_chart']['dades_list'] = forecast_dates_str
+        charts_data['cost_chart']['series'] = [
+            {'name': 'прогноз', 'data': forecast_values_rounded.tolist()},
+        ]
+       
+
+        def custom_serializer(obj):
+            if isinstance(obj, (datetime, date)):
+                serial = obj.isoformat()
+                return serial
+
+        json_charts_data = json.dumps(charts_data, default=custom_serializer)
+
+        context['charts_data'] = json_charts_data
+        return context
+
+
+class SalesView(LoginRequiredMixin, FilterView):
+    model = Item
+    filterset_class = ItemFilter
+    template_name = 'analytics/sales.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()  # Получите исходный queryset
+        # Примените фильтр, если он был отправлен в запросе
+        self.filterset = ItemFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs  # Верните отфильтрованный queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        
+        items = (
+            queryset.filter(sold=True)
+            .values('sales_date')
+            .annotate(
+                total_price=Sum(ExpressionWrapper(F('quantity') * F('sales_price'), output_field=FloatField())),
+                total_profit=Sum(ExpressionWrapper(F('quantity') * (F('sales_price') - F('purchase_price')), output_field=FloatField())),
                 total_quantity=Sum(F('quantity')),
                 
             )
@@ -81,11 +116,12 @@ class SalesView(LoginRequiredMixin, FilterView):
         )
         
         # Обработка и подготовка данных
-        data = {'sales_date_list': [], 'all_total_price_list': [], 'all_total_quantity_list': []}
+        data = {'sales_date_list': [], 'all_total_price_list': [], 'all_total_profit_list': [], 'all_total_quantity_list': []}
         for item in items:
         
             data['sales_date_list'].append(item['sales_date'])
             data['all_total_price_list'].append(item['total_price'])
+            data['all_total_profit_list'].append(item['total_profit'])
             data['all_total_quantity_list'].append(item['total_quantity'])
 
         
@@ -102,6 +138,7 @@ class SalesView(LoginRequiredMixin, FilterView):
         charts_data['cost_chart']['dades_list'] = sales_date_list
         charts_data['cost_chart']['series'] = [
             {'name': 'Сбыто в (BYN)', 'data': df['all_total_price_list'].tolist()},
+            {'name': 'Прыбыль в (BYN)', 'data': df['all_total_profit_list'].tolist()},
            
         ]
         charts_data['quantity_chart'] = dict()
@@ -209,7 +246,15 @@ class MixedView(LoginRequiredMixin, FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         queryset = self.get_queryset()
-        
+        items2 = (
+            queryset.filter(sold=False)
+            .values('purchase_date')
+            .annotate(
+                received_total_price=Sum(ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField())),
+                received_total_quantity =Sum(F('quantity')),
+            )
+            .order_by('purchase_date')
+        )
         items1 = (
             queryset.filter(sold=True)
             .values('sales_date')
@@ -220,15 +265,7 @@ class MixedView(LoginRequiredMixin, FilterView):
             )
             .order_by('sales_date')
         )
-        items2 = (
-            queryset.filter(sold=False)
-            .values('purchase_date')
-            .annotate(
-                received_total_price=Sum(ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField())),
-                received_total_quantity =Sum(F('quantity')),
-            )
-            .order_by('purchase_date')
-        )
+        
         
         # Обработка и подготовка данных
         data1 = {'date_list': [], 'all_sales_total_price_list': [], 'all_sales_total_quantity_list': []}

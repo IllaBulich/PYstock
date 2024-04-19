@@ -1,20 +1,55 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
 from .filters import ItemFilter
-from .models import Product,Item
-from .forms import ProductForm, ItemForm
+from .models import Product, Item
+from .forms import ProductForm, ItemForm, QRCodeUploadForm
 from django.views.generic import DetailView, DeleteView, UpdateView,  ListView, CreateView
 from django.http import JsonResponse
 import json
 import qrcode
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from PIL import Image
+from pyzbar.pyzbar import decode
+
+def upload_qr_code(request):
+    if request.method == 'POST':
+        form = QRCodeUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Получаем изображение из формы
+            image = form.cleaned_data['image']
+            
+            # Считываем QR-коды на изображении
+            decoded_objects = decode(Image.open(image))
+
+            # Получаем данные из QR-кодов
+            qr_data = [obj.data.decode('utf-8') for obj in decoded_objects]
+
+            # Получаем последний элемент списка
+            last_url = qr_data[0]
+
+            # Разбиваем URL-адрес по символу '/' и получаем последний элемент
+            last_number = last_url.split('/')[-1]
+
+            # Преобразуем последний номер в целое число
+            last_number_int = int(last_number)
+            try:
+                item = get_object_or_404(Item, pk=last_number_int)
+                # Отобразить данные QR-кода на странице
+                return render(request, 'item/qr_code_result.html', {'item': item})
+            except:
+                return render(request, 'item/upload_qr.html', {'form': form, 'error_message': 'Объект с таким ID не найден.'})
+        
+            
+    else:
+        form = QRCodeUploadForm()
+    return render(request, 'item/upload_qr.html', {'form': form})
 
 def generate_qr_code(request, item_id):
-    # Получаем объект модели Item
-    item = get_object_or_404(Item, pk=item_id)
+    # # Получаем объект модели Item
+    # item = get_object_or_404(Item, pk=item_id)
 
     # Создаем URL-адрес страницы деталей объекта модели Item
     item_detail_url = request.build_absolute_uri(reverse('item/item_detail', kwargs={'pk': item_id}))

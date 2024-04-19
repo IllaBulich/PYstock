@@ -9,9 +9,31 @@
 <div class="container mt-5">
     <div class="row">
     <div class="col-3">
-    
-        <form method="get">
-            {{ filter.form.as_p }}
+        <form method="get" class="your-form-class">
+            {{ filter.form.non_field_errors }}
+            <div class="mb-3">
+                {{ filter.form.date_range__gte.label_tag }}
+                {{ filter.form.date_range__gte }}
+            </div>
+            <div class="mb-3">
+                {{ filter.form.date_range__lte.label_tag }}
+                {{ filter.form.date_range__lte }}
+            </div>
+        
+            <div class="mb-3">
+                {{ filter.form.stock.label_tag }}
+                {{ filter.form.stock }}
+            </div>
+            <div class="mb-3">
+                {{ filter.form.product.label_tag }}
+                {{ filter.form.product }}
+            </div>
+        
+            <div class="mb-3">
+                {{ filter.form.vendor_code.label_tag }}
+                {{ filter.form.vendor_code }}
+            </div>
+        
             <button type="submit" class="btn btn-outline-secondary">Применить фильтр</button>
         </form>
     </div>

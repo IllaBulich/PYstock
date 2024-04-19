@@ -44,6 +44,9 @@ class Item(models.Model):
     def calculation_quantity_rack(self):
         return self.get_current_amount() / self.product.quantity_rack
     
+    def purchase_price_str(self):
+        return str(self.purchase_price)
+    
     def get_absolute_url(self):
         return f'/product/item/{self.id}'
     
@@ -54,16 +57,16 @@ class Item(models.Model):
     def createSaleItem(cls, item_data, user):
         
         item = cls.objects.get(id=item_data['id'])
-        if item.soldQuantity + item_data['quantity'] > item.quantity: 
+        if item.soldQuantity + int(item_data['quantity']) > item.quantity: 
             return "erorr"
-        item.soldQuantity += item_data['quantity']
+        item.soldQuantity += int(item_data['quantity'])
         if item.soldQuantity == item.quantity:
             item.available = False
 
         saleItem = cls()
         saleItem.product = item.product
         saleItem.stock = item.stock
-        saleItem.quantity = item_data['quantity']
+        saleItem.quantity = int(item_data['quantity'])
         saleItem.purchase_price = item.purchase_price
         saleItem.purchase_date = item.purchase_date
         saleItem.sales_price = item_data['cost']
@@ -76,8 +79,8 @@ class Item(models.Model):
 
         saleItem.sold = True
         saleItem.available = False
-        item.stock.calculation_occupancy_status()
         item.save()
+        item.stock.calculation_occupancy_status()
         saleItem.responsible = user
         saleItem.save()
         

@@ -7,6 +7,6 @@ urlpatterns = [
     path('',views.FuncView.as_view(), name='view_func'),
     path('sales',views.SalesView.as_view(), name='view_sales'),
     path('mixed',views.MixedView.as_view(), name='view_mixed'),
-    path('1',views.demand_forecast, name='demand_forecast'),
+    path('1',views.DemandForecastView.as_view(), name='demand_forecast'),
     
 ]

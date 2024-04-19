@@ -1,0 +1,69 @@
+{% extends 'main/layout.html'%}
+{% load static %}
+
+{% block title %} ВЕБ-СКЛАД {% endblock %}
+
+{% block container %}
+<div class="container mt-5">
+    
+    
+    <h1>{{item.product.name}}</h1><br>
+
+    <div class="row g-5 mt-2">
+        <div class="col-md-4">
+            <ul class="icon-list ps-0">
+                <li class="row mb-1">
+                    <div class="col"><b>Артикул: </b></div>
+                    <div class="col"><p>{{item.product.vendor_code}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Помещяется на один стелаж: </b></div>
+                    <div class="col"><p>{{item.product.quantity_rack}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Количество: </b></div>
+                    <div class="col"><p>{{item.get_current_amount}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Стоймасть закупки: </b></div>
+                    <div class="col"><p>{{item.purchase_price}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Дата поступления: </b></div>
+                    <div class="col"><p>{{item.purchase_date}}</p></div>
+                </li>
+                <li class="row mb-1">
+                    <div class="col"><b>Количество cбыто: </b></div>
+                    <div class="col"><p>{{item.soldQuantity}}</p></div>
+                </li>
+            
+            </ul>
+            <div><h4>Описание: </h4><p>{{item.product.description}}</p></div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-3"><h6>Кол. для отгрузки:</h6></div>
+                <div class="col-5"><div class="input-group mb-3"><input type="number"  class="form-control"  id="quantity" min="0" value="0"></div></div>
+                
+            </div>
+            <div class="row">
+                <div class="col-3"><h6>Стоймость ед. (BYN):</h6></div>
+                <div class="col-5">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Br</span>
+                        <input type="number" class="form-control"  id="cost" min="0" step="0.01" value="{{ item.purchase_price_str }}">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3"><h6>Дата отгрузки:</h6></div>
+                <div class="col-5"><div class="input-group mb-3"><input type="date" name="date" class="form-control" id="id_date"></div></div>
+                
+            </div>
+            <button id="submitData" class="btn btn-primary btn-lg" data-item-id="{{ item.id }}">Выполнить отгрузку</button>
+        </div>
+       
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'product/js/salesqr.js' %}"></script>
+{% endblock %}

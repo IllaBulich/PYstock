@@ -1,5 +1,5 @@
 from .models import Product, Item
-from django.forms import ModelForm, TextInput, Select, DateInput, NumberInput,Textarea , Form , IntegerField, DecimalField
+from django.forms import ModelForm, TextInput, Select, DateInput, NumberInput,Textarea , Form , ImageField, FileInput
 
 class ItemForm(ModelForm):
     # purchase_date = DateField(label='Дата поступления', widget=DateInput(attrs={'class': 'vDateField', 'size': '10', 'required': True}))
@@ -38,7 +38,11 @@ class ItemForm(ModelForm):
 
         }
 
-
+class QRCodeUploadForm(Form):
+    image = ImageField(widget= FileInput(attrs = {
+                'class': 'form-control',
+            }))
+   
 
 class ProductForm(ModelForm):
      class Meta:

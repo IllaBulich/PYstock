@@ -6,33 +6,49 @@
 
 {% block container %}
 {% include 'analytics/navbar.html' %}
-<div id="container" ></div>
-не понял
-<script src="https://code.highcharts.com/highcharts.js"></script>
- 
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>    
-    <script>
-        console.log("forecast_values=", {{forecast_values}})
+<div class="container mt-5">
+    <div class="row">
+    <div class="col-3">
+    
+        <form method="get" class="your-form-class">
+            {{ filter.form.non_field_errors }}
+            
         
-        Highcharts.chart('container', {
-            title: {
-                text: 'Прогнозирование спроса'
-            },
-            xAxis: {
-                
-                categories: {{ forecast_dates | safe }},
-                
-            },
-            yAxis: {
-                title: {
-                    text: 'Количество едениц'
-                }
-            },
-            series: [{
-                name: 'Спрос',
-                data: [{% for value in forecast_values %}{{ value }}, {% endfor %}]
-            }]
-        });
-    </script>
+            <div class="mb-3">
+                {{ filter.form.stock.label_tag }}
+                {{ filter.form.stock }}
+            </div>
+            <div class="mb-3">
+                {{ filter.form.product.label_tag }}
+                {{ filter.form.product }}
+            </div>
+        
+            <div class="mb-3">
+                {{ filter.form.vendor_code.label_tag }}
+                {{ filter.form.vendor_code }}
+            </div>
+        
+            <button type="submit" class="btn btn-outline-secondary">Применить фильтр</button>
+        </form>
+    </div>
+    <div class="col-9">
+        <div id="container" ></div>
+    </div>
+
+   
+    
+    
+</div>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<!-- Вставка данных JSON внутри тега <script> -->
+<script>
+    var chartsData = {{ charts_data| safe }};
+</script>
+
+<!-- Здесь вы можете использовать переменную chartsData в JavaScript -->
+<script src="{% static 'analytics/js/demand_forecast.js' %}"></script>
     
 {% endblock %}
