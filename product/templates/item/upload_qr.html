@@ -3,7 +3,7 @@
 {% block title %} ВЕБ-СКЛАД {% endblock %}
 
 {% block container %}
-<div class="container mt-5">
+
     {% if error_message %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{error_message}}
@@ -26,5 +26,5 @@
                 Загрузить
     </button>
 </form>
-</div>
+
 {% endblock %}

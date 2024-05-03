@@ -3,7 +3,7 @@
 {% block title %} ВЕБ-СКЛАД {% endblock %}
 
 {% block container %}
-<div class="container mt-5 md-5">
+
     {% if form.errors %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{form.errors}}
@@ -19,6 +19,5 @@
         <button type="submit" class="btn btn-success">Сохранить</button>
     </form>
 
-</div>
 
 {% endblock %}

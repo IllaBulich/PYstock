@@ -4,7 +4,7 @@
 {% block title %} ВЕБ-СКЛАД {% endblock %}
 
 {% block container %}
-<div class="container mt-5">
+
     
     
     <h1>{{item.product.name}}</h1><br>
@@ -63,7 +63,7 @@
             <button id="submitData" class="btn btn-primary btn-lg" data-item-id="{{ item.id }}">Выполнить отгрузку</button>
         </div>
        
-</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'product/js/salesqr.js' %}"></script>
 {% endblock %}

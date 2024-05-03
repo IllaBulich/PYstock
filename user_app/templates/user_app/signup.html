@@ -1,0 +1,27 @@
+{% extends 'main/layout.html'%}
+{% block title %}{{ title }}{% endblock %}
+{% block container %}
+<div class="form-section container mt-3 ">
+    <div class="col-lg-4 col-sm-12">
+        <h2>Регистрация</h2>
+        <form method="post">  
+            {% csrf_token %}  
+            {% if form.non_field_errors %}  
+                <div class="alert alert-danger">  
+                    {{ form.non_field_errors }}  
+                </div>  
+            {% endif %}  
+            {% for field in form %}  
+                <p class="form-label">{{ field.label }}</p>  
+                <p>{{ field }}</p>  
+                {% if field.errors %}  
+                    <ul class="alert alert-danger">  
+                        {{ field.errors }}  
+                    </ul>  
+                {% endif %}  
+            {% endfor %}  
+            <button type="submit" class="btn btn-outline-success">Зарегистрироваться</button>  
+        </form>
+    </div>
+</div>
+{% endblock %}

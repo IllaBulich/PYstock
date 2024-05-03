@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'user_app',
     'main',
     'warehouses',
     'product',
@@ -61,6 +62,8 @@ ROOT_URLCONF = 'PYstock.urls'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 
 TEMPLATES = [
     {

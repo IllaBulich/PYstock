@@ -1,0 +1,44 @@
+{% extends 'main/layout.html'%}
+{% block title %}{{ title }}{% endblock %}
+{% block container %}
+    <div class="container mt-3">
+        <div class="row d-flex justify-content-between align-items-center">
+            <div class="col-lg-10 col-sm-12">
+                <h2>Настройки профиля {{ user }}</h2>
+            </div>
+            <div class="col-lg-2 col-sm-12 text-right">
+                <a class="btn btn-primary my-btn h-100"
+                   href="{% url 'user_app:user_profile' username=user.username %}">Вернуться в профиль</a>
+            </div>
+        </div>
+        <hr>
+        <div class="row d-flex justify-content-evenly">
+            <div class="row text-center">
+                {% if messages %}
+                    <p class="alert alert-success">
+                        {% for message in messages %}
+                            {{ message }}<br>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+            <div class="col-lg-4 col-sm-12">
+                <h3 class="mb-3 mt-3">Изменить данные:</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ user_info_form.as_p }}
+                    <button class="btn btn-primary my-btn mt-2" type="submit" name="user_info_form">Отправить</button>
+                </form>
+            </div>
+            <div class="col-lg-4 col-sm-12">
+                <h3 class="mb-3 mt-3">Изменить пароль:</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ user_password_form.as_p }}
+                    <button class="btn btn-primary my-btn mt-2" type="submit" name="user_password_form">Отправить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

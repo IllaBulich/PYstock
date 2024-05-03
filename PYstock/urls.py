@@ -22,9 +22,10 @@ from django.urls import path, include
 urlpatterns = [
     path('', include("main.urls")),
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/', include('django.contrib.auth.urls')),
     path('warehouses/', include('warehouses.urls')),
     path('product/', include('product.urls')),
-    path('analytics/',include('analytics.urls'))
+    path('analytics/',include('analytics.urls')),
+    path('user/', include('user_app.urls', namespace='user_app')),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
