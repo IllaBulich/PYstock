@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views
 
+app_name = "analytics"
 urlpatterns = [
     # path('',views.view_func, name='view_func'),
     path('',views.FuncView.as_view(), name='view_func'),

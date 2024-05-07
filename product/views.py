@@ -130,7 +130,7 @@ class ItemListView(LoginRequiredMixin,FilterView):
                 # у вас есть метод createSaleItem в модели Item или менеджере модели
                 print(Item.createSaleItem(item_data,self.request.user))
             # Возвращаем ответ об успешной обработке
-            return redirect('warehouses/main')
+            return redirect('warehouses:main')
         except json.JSONDecodeError:
             # Если возникла ошибка при разборе JSON, возвращаем сообщение об ошибке
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
