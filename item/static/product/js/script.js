@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Отправка данных на сервер с использованием fetch API
-        fetch('/product/sales_item', {
+        fetch('/item/sales_item', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

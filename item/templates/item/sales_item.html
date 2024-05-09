@@ -42,7 +42,7 @@
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-outline-secondary">Применить фильтр</button>
-                    <a href="{% url 'upload_qr_code'%}" class="btn btn-secondary">
+                    <a href="{% url 'item:upload_qr_code'%}" class="btn btn-secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code" viewBox="0 0 16 16">
                         <path d="M2 2h2v2H2z"></path>
                         <path d="M6 0v6H0V0zM5 1H1v4h4zM4 12H2v2h2z"></path>
@@ -74,7 +74,7 @@
                 </tr>
                 </thead>
                 <tbody id="table-body">
-                {% for el in filter.qs%}
+                {% for el in filter.qs %}
                 <tr data-item-id="{{ el.id }}">
                     <th>{{el.product.name}}</th>
                     <th>{{el.stock.title}}</th>

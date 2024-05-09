@@ -1,9 +1,9 @@
 
-from product.models import Item
+from item.models import Item
 from django.db.models import  F, ExpressionWrapper, FloatField, Sum
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
-from product.filters import ItemFilter
+from item.filters import ItemFilter
 import json
 
 from datetime import datetime, date

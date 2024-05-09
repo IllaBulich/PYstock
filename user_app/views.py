@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.urls import reverse_lazy
-from product.models import Item
+from item.models import Item
 
 from user_app.forms import LoginForm, RegistrationForm, CustomPasswordResetForm, CustomSetPasswordForm, ProfileForm, UserInfoForm, UserPasswordForm
 

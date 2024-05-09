@@ -1,6 +1,6 @@
 from django_filters import FilterSet, DateFilter, ModelChoiceFilter, CharFilter, Filter
 from django.db.models import Q
-from .models import Item, Product
+from product.models import  Product
 from warehouses.models import Stock
 from django.forms import DateInput,Select,TextInput
 

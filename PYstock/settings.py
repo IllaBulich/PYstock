@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'main',
     'warehouses',
     'product',
+    'item',
     'analytics',
     'googlecharts',
     'django_filters',
