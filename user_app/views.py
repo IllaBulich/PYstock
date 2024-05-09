@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, ListView
 from django.shortcuts import get_object_or_404
 from django.http import Http404, HttpResponseForbidden
 from django.contrib import messages
@@ -9,7 +9,7 @@ from django.contrib.auth.views import LoginView, PasswordResetView, PasswordRese
 from django.urls import reverse_lazy
 from product.models import Item
 
-from user_app.forms import LoginForm, RegistrationForm, CustomPasswordResetForm, CustomSetPasswordForm, UserInfoForm, UserPasswordForm
+from user_app.forms import LoginForm, RegistrationForm, CustomPasswordResetForm, CustomSetPasswordForm, ProfileForm, UserInfoForm, UserPasswordForm
 
 
 class CustomPasswordResetView(PasswordResetView):  
@@ -57,6 +57,7 @@ class UserProfileView(TemplateView):
         except User.DoesNotExist:  
             raise Http404("Пользователь не найден")  
         context['user_profile'] = user  
+        
         context['user_item'] = Item.objects.filter(responsible = user).order_by('-id')[:5]
         context['title'] = f'Профиль пользователя {user}'  
         return context
@@ -75,20 +76,25 @@ class UserSettingsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)  
         context['user_info_form'] = UserInfoForm(instance=self.request.user)  
         context['user_password_form'] = UserPasswordForm(self.request.user)  
+        context['user_profile_form'] = ProfileForm(instance=self.request.user.profile)
         context['title'] = f'Настройки профиля {self.request.user}'  
         return context  
 
     def post(self, request, *args, **kwargs):  
         if 'user_info_form' in request.POST:  
-            form = UserInfoForm(request.POST, instance=request.user)  
-            if form.is_valid():  
-                form.save()  
+            user_info_form = UserInfoForm(request.POST, instance=request.user)  
+            user_profile_form = ProfileForm(request.POST, request.FILES, instance=self.request.user.profile)
+            if user_info_form.is_valid() and user_profile_form.is_valid():
+                user_info_form.save()  
+                user_profile_form.save()
                 messages.success(request, 'Данные успешно изменены.')  
-                return redirect('user_app:user_profile_settings', form.cleaned_data.get('username'))  
+                return redirect('user_app:user_profile_settings', user_info_form.cleaned_data.get('username'))  
             else:  
                 context = self.get_context_data(**kwargs)  
-                context['user_info_form'] = form  
+                context['user_info_form'] = user_info_form  
+                context['user_profile_form'] = user_profile_form
                 return render(request, self.template_name, context)  
+            
         elif 'user_password_form' in request.POST:  
             form = UserPasswordForm(request.user, request.POST)  
             if form.is_valid():  
@@ -101,3 +107,28 @@ class UserSettingsView(LoginRequiredMixin, TemplateView):
                 return render(request, self.template_name, context)  
         else:  
             return self.get(request, *args, **kwargs)
+
+
+class UserItemView(ListView):
+    template_name = 'user_app/user_item_page.html'  
+    context_object_name = 'items'  
+    paginate_by = 10  
+
+    def get_queryset(self): 
+        try:  
+            user = get_object_or_404(User, username=self.kwargs.get('username'))  
+        except User.DoesNotExist:  
+            raise Http404("Пользователь не найден")  
+        
+        return Item.objects.filter(responsible = user).order_by('-id')
+         
+
+    def get_context_data(self, **kwargs):  
+        context = super().get_context_data(**kwargs)  
+        try:  
+            author = get_object_or_404(User, username=self.kwargs.get("username"))  
+        except User.DoesNotExist:  
+            raise Http404("Пользователь не найден")  
+        context['author'] = author  
+        context['title'] = f'Посты пользователя {author}'  
+        return context

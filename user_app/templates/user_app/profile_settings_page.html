@@ -1,5 +1,7 @@
 {% extends 'main/layout.html'%}
 {% block title %}{{ title }}{% endblock %}
+
+
 {% block container %}
     <div class="container mt-3">
         <div class="row d-flex justify-content-between align-items-center">
@@ -22,12 +24,78 @@
                     </p>
                 {% endif %}
             </div>
-            <div class="col-lg-4 col-sm-12">
-                <h3 class="mb-3 mt-3">Изменить данные:</h3>
-                <form method="post">
-                    {% csrf_token %}
-                    {{ user_info_form.as_p }}
-                    <button class="btn btn-primary my-btn mt-2" type="submit" name="user_info_form">Отправить</button>
+            <div class="col-lg-8 col-sm-12">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <h3 class="mb-3 mt-3">Основная информация:</h3>
+                            {% csrf_token %}
+                            {% for error in user_info_form.errors.values %}
+                                {{ error }}
+                            {% endfor %}
+
+                            {{ user_info_form.username.label }}
+                            {{ user_info_form.username }}
+
+                            <br>
+                            {{ user_info_form.email.label }}
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    {{ user_profile_form.show_email }}
+                                    <span class="ms-2">Отображать?</span>
+                                </div>
+                                {{ user_info_form.email }}
+                            </div>
+
+                            <br>
+                            {{ user_info_form.first_name.label }}
+                            {{ user_info_form.first_name }}
+
+                            <br>
+                            {{ user_info_form.last_name.label }}
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    {{ user_profile_form.show_last_name }}
+                                    <span class="ms-2">Отображать?</span>
+                                </div>
+                                {{ user_info_form.last_name }}
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <h3 class="mb-3 mt-3">Дополнительная информация:</h3>
+                            {% for error in user_profile_form.errors.values %}
+                                {{ error }}
+                            {% endfor %}
+
+                            {{ user_profile_form.gender.label }}
+                            {{ user_profile_form.gender }}
+
+                            <br>
+                            {{ user_profile_form.dob.label }}
+                            {{ user_profile_form.dob }}
+
+                            <br>
+                            {{ user_profile_form.telegram_link.label }}
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    {{ user_profile_form.show_telegram }}
+                                    <span class="ms-2">Отображать?</span>
+                                </div>
+                                {{ user_profile_form.telegram_link }}
+                            </div>
+
+                            <br>
+                            {{ user_profile_form.user_avatar.label }}
+                            {{ user_profile_form.user_avatar }}<br>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <button class="btn btn-primary my-btn text-center mt-1" type="submit" name="user_info_form">
+                                Отправить
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="col-lg-4 col-sm-12">
@@ -35,8 +103,13 @@
                 <form method="post">
                     {% csrf_token %}
                     {{ user_password_form.as_p }}
-                    <button class="btn btn-primary my-btn mt-2" type="submit" name="user_password_form">Отправить
-                    </button>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <button class="btn btn-primary my-btn mt-3" type="submit" name="user_password_form">
+                                Отправить
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

@@ -4,6 +4,82 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import password_validation  
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
+from .models import ProfileModel
+
+
+class ProfileForm(forms.ModelForm):  
+    gender = forms.ChoiceField(  
+        label='Пол',  
+        choices=ProfileModel.Genders.choices,  
+        required=False,  
+        widget=forms.Select(  
+            attrs={  
+                'class': 'form-select',  
+            }  
+        )  
+    )  
+    dob = forms.DateField(  
+        label='Дата рождения',  
+        required=False,  
+        widget=forms.DateInput(  
+            format='%Y-%m-%d',  
+            attrs={  
+                'type': 'date',  
+                'class': 'form-control',  
+            }  
+        )  
+    )  
+    
+    telegram_link = forms.CharField(  
+        label='Профиль в Telegram',  
+        required=False,  
+        widget=forms.TextInput(  
+            attrs={  
+                'class': 'form-control',  
+                'placeholder': 'https://t.me/...'  
+            }  
+        )  
+    )  
+    user_avatar = forms.FileField(  
+        label='Аватарка',  
+        required=False,  
+        widget=forms.FileInput(  
+            attrs={  
+                'type': 'file',  
+                'class': 'form-control',  
+            }  
+        )  
+    )  
+
+    show_last_name = forms.BooleanField(  
+        required=False,  
+        widget=forms.CheckboxInput(  
+            attrs={  
+                'class': 'form-check-input mt-0',  
+            }  
+        )  
+    )  
+    show_email = forms.BooleanField(  
+        required=False,  
+        widget=forms.CheckboxInput(  
+            attrs={  
+                'class': 'form-check-input mt-0',  
+            }  
+        )  
+    )  
+    show_telegram = forms.BooleanField(  
+        required=False,  
+        widget=forms.CheckboxInput(  
+            attrs={  
+                'class': 'form-check-input mt-0'  
+            }  
+        )  
+    )  
+
+    class Meta:  
+        model = ProfileModel  
+        fields = ['gender', 'dob', 'telegram_link', 'user_avatar', 'show_last_name', 'show_email',  
+                  'show_telegram']
 
 
 class UserPasswordForm(PasswordChangeForm):  

@@ -16,7 +16,7 @@
                         <th scope="col">Дата поступления</th>
                         <th scope="col">Стоймасть закупки</th>
                         <th scope="col">Артикул</th>
-                        <th scope="col">На складе</th>
+                        <th scope="col">Количество</th>
                         <th scope="col"></th>
                     </tr>
                     </thead>
@@ -27,13 +27,26 @@
                             <th>{{el.purchase_date}}</th>
                             <th>{{el.purchase_price}}</th>
                             <th>{{el.product.vendor_code}}</th>
-                            <th>{{el.get_current_amount}}</th>
+                            <th>{{el.quantity}}</th>
                             
                             <th>
                                 {% if el.sold == False %}
-                                    <p>поступление</p>
+                                <p class="text-success">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-up-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M6.364 13.5a.5.5 0 0 0 .5.5H13.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 13.5 1h-10A1.5 1.5 0 0 0 2 2.5v6.636a.5.5 0 1 0 1 0V2.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H6.864a.5.5 0 0 0-.5.5"></path>
+                                    <path fill-rule="evenodd" d="M11 5.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793l-8.147 8.146a.5.5 0 0 0 .708.708L10 6.707V10.5a.5.5 0 0 0 1 0z"></path>
+                                    </svg>
+                                    Поступление
+                                </p>
                                 {% else %}
-                                    <p>отгрузка</p>
+                                <p class="text-warning">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-down-left" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M7.364 12.5a.5.5 0 0 0 .5.5H14.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 14.5 0h-10A1.5 1.5 0 0 0 3 1.5v6.636a.5.5 0 1 0 1 0V1.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H7.864a.5.5 0 0 0-.5.5"></path>
+                                        <path fill-rule="evenodd" d="M0 15.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1H1.707l8.147-8.146a.5.5 0 0 0-.708-.708L1 14.293V10.5a.5.5 0 0 0-1 0z"></path>
+                                    </svg>
+                                    Отгрузка</p>
+                                </p>
+                                    
                                 {% endif %}
                             </th>
                         </tr>
@@ -42,27 +55,55 @@
                 </table>
                 
                 <div class="text-center mt-3">
-                    <a class="btn btn-primary my-btn mb-3" href="#">Все посты {{ user_profile }}</a>
+                    <a class="btn btn-primary my-btn mb-3" href="{% url 'user_app:user_item' username=user_profile.username %}">Все действия {{ user_profile }}</a>
                 </div>
             </div>
-            <div class="col-xl-4 col-sm-12 border border-start border-0">
-            <h3 class="mb-3">Информация:</h3>
-                <p>
+            <div class="col-xl-4 col-sm-12 border border-start border-0Z">
+                <h3 class="mb-3 text-center">Информация:</h3>
+                <div class="col-12 text-center">
+                    <img src="{{ user_profile.profile.user_avatar.url }}" alt="{{ user_profile }}" width="300"
+                         height="300" class="img-fluid"><br>
+                    {% for group in user_profile.groups.all %}
+                        <span class="badge rounded-pill text-bg-light">{{ group.name }}</span>
+                    {% endfor %}
+                </div>
+                <div class="col-12 ms-3 mt-4">
                     <b>Имя пользователя:</b> {{ user_profile }}
+                    <hr class="mb-0">
                     {% if user_profile.first_name %}
                         <br>
                         <b>Имя:</b> {{ user_profile.first_name }}
                     {% endif %}
-                    {% if user_profile.last_name %}
+                    {% if user_profile.last_name and user_profile.profile.show_last_name %}
                         <br>
                         <b>Фамилия:</b> {{ user_profile.last_name }}
                     {% endif %}
-                </p>
-                {% if user_profile == user %}
-                    <a class="btn btn-primary my-btn me-1"  
-                        href="{% url 'user_app:user_profile_settings' username=user_profile.username %}">Настройки профиля
-                    </a>
-                {% endif %}
+                    <br>
+                    <b>Пол:</b> {{ user_profile.profile.get_gender_display }}
+                    {% if user_profile.profile.dob %}
+                        <br>
+                        <b>Возраст:</b> {{ user_profile.profile.get_age }}
+                    {% endif %}
+                    
+                    <hr class="mb-0">
+                    {% if user_profile.profile.show_email %}
+                        <br>
+                        <b>Email:</b> {{ user_profile.email }}
+                    {% endif %}
+                    {% if user_profile.profile.show_telegram %}
+                        <br>
+                        <b>Ссылка на Telegram:</b> <a
+                            href="{{ user_profile.profile.telegram_link }}">{{ user_profile.profile.get_telegram_username }}</a>
+                    {% endif %}
+                    
+                </div>
+                <div class="col-12 text-center mt-5">
+                    {% if user_profile == user %}
+                        <a class="btn btn-primary my-btn"
+                           href="{% url 'user_app:user_profile_settings' username=user_profile.username %}">Настройки
+                            профиля</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
