@@ -8,16 +8,22 @@
         <div class="row">
             <div class="col-xl-8 сol-sm-12">
                 <h3 class="mb-3">Последние дейстрия:</h3>
-                 
-            <table class="table table-striped-columns">
-                <thead>
+                <p class="text-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-up-right" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M6.364 13.5a.5.5 0 0 0 .5.5H13.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 13.5 1h-10A1.5 1.5 0 0 0 2 2.5v6.636a.5.5 0 1 0 1 0V2.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H6.864a.5.5 0 0 0-.5.5"></path>
+                    <path fill-rule="evenodd" d="M11 5.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793l-8.147 8.146a.5.5 0 0 0 .708.708L10 6.707V10.5a.5.5 0 0 0 1 0z"></path>
+                    </svg>
+                    Поступление
+                </p>
+                <table class="table table-striped-columns">
+                    <thead>
                     <tr>
                         <th scope="col">Название</th>
                         <th scope="col">Дата поступления</th>
                         <th scope="col">Стоймасть закупки</th>
                         <th scope="col">Артикул</th>
                         <th scope="col">Количество</th>
-                        <th scope="col"></th>
+                       
                     </tr>
                     </thead>
                     <tbody>
@@ -28,34 +34,45 @@
                             <th>{{el.purchase_price}}</th>
                             <th>{{el.product.vendor_code}}</th>
                             <th>{{el.quantity}}</th>
-                            
-                            <th>
-                                {% if el.sold == False %}
-                                <p class="text-success">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-up-right" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M6.364 13.5a.5.5 0 0 0 .5.5H13.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 13.5 1h-10A1.5 1.5 0 0 0 2 2.5v6.636a.5.5 0 1 0 1 0V2.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H6.864a.5.5 0 0 0-.5.5"></path>
-                                    <path fill-rule="evenodd" d="M11 5.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793l-8.147 8.146a.5.5 0 0 0 .708.708L10 6.707V10.5a.5.5 0 0 0 1 0z"></path>
-                                    </svg>
-                                    Поступление
-                                </p>
-                                {% else %}
-                                <p class="text-warning">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-down-left" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M7.364 12.5a.5.5 0 0 0 .5.5H14.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 14.5 0h-10A1.5 1.5 0 0 0 3 1.5v6.636a.5.5 0 1 0 1 0V1.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H7.864a.5.5 0 0 0-.5.5"></path>
-                                        <path fill-rule="evenodd" d="M0 15.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1H1.707l8.147-8.146a.5.5 0 0 0-.708-.708L1 14.293V10.5a.5.5 0 0 0-1 0z"></path>
-                                    </svg>
-                                    Отгрузка</p>
-                                </p>
-                                    
-                                {% endif %}
-                            </th>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                
                 <div class="text-center mt-3">
                     <a class="btn btn-primary my-btn mb-3" href="{% url 'user_app:user_item' username=user_profile.username %}">Все действия {{ user_profile }}</a>
+                </div>
+                <p class="text-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-down-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M7.364 12.5a.5.5 0 0 0 .5.5H14.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 14.5 0h-10A1.5 1.5 0 0 0 3 1.5v6.636a.5.5 0 1 0 1 0V1.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H7.864a.5.5 0 0 0-.5.5"></path>
+                        <path fill-rule="evenodd" d="M0 15.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1H1.707l8.147-8.146a.5.5 0 0 0-.708-.708L1 14.293V10.5a.5.5 0 0 0-1 0z"></path>
+                    </svg>
+                    Отгрузка</p>
+                </p>
+                <table class="table table-striped-columns">
+                    <thead>
+                    <tr>
+                        <th scope="col">Название</th>
+                        <th scope="col">Дата поступления</th>
+                        <th scope="col">Стоймасть закупки</th>
+                        <th scope="col">Артикул</th>
+                        <th scope="col">Количество</th>
+                        
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for el in user_selt_item%}
+                        <tr>
+                            <th>{{el.product.name}}</th>
+                            <th>{{el.purchase_date}}</th>
+                            <th>{{el.purchase_price}}</th>
+                            <th>{{el.product.vendor_code}}</th>
+                            <th>{{el.quantity}}</th>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-center mt-3">
+                    <a class="btn btn-primary my-btn mb-3" href="{% url 'user_app:user_sales_item' username=user_profile.username %}">Все действия {{ user_profile }}</a>
                 </div>
             </div>
             <div class="col-xl-4 col-sm-12 border border-start border-0Z">

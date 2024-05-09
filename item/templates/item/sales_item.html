@@ -74,7 +74,7 @@
                 </tr>
                 </thead>
                 <tbody id="table-body">
-                {% for el in filter.qs %}
+                {% for el in item %}
                 <tr data-item-id="{{ el.id }}">
                     <th>{{el.product.name}}</th>
                     <th>{{el.stock.title}}</th>
@@ -106,6 +106,9 @@
             </div>
         </div>
     </div>
+    <div class="col-12">  
+        {% include "main/pagination.html" %}  
+      </div> 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'product/js/script.js' %}"></script>

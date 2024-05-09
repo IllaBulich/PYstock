@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
 from .filters import ItemFilter
-from .models import  Item
+from .models import  Item, SalesItem
 from .forms import  ItemForm, QRCodeUploadForm
 from django.views.generic import DetailView,  UpdateView,  CreateView
 from django.http import JsonResponse
@@ -13,6 +13,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from PIL import Image
 from pyzbar.pyzbar import decode
+from django.core.paginator import Paginator
 
 def upload_qr_code(request):
     if request.method == 'POST':
@@ -98,6 +99,11 @@ class ItemDetailView(LoginRequiredMixin,DetailView):
     template_name = "item/details_item_view.html"
     context_object_name = "item"
 
+class SalesItemDetailView(LoginRequiredMixin,DetailView):
+    model = SalesItem
+    template_name = "item/details_sales_item_view.html"
+    context_object_name = "item"
+
 class ItemUpdateView(LoginRequiredMixin,UpdateView):
     model = Item
     template_name = "item/update_item.html"
@@ -108,14 +114,15 @@ class ItemListView(LoginRequiredMixin,FilterView):
     model = Item
     filterset_class = ItemFilter
     template_name = 'item/sales_item.html'
+    paginate_by = 3 
+    context_object_name = 'item'
 
-
+    
     def get_queryset(self):
         queryset = super().get_queryset()
-        # Получаем отфильтрованные результаты с помощью фильтра Django
-        filtered_queryset = self.filterset_class(self.request.GET, queryset=queryset).qs
-        # Возвращаем только элементы, у которых available=True
-        return filtered_queryset.filter(available=True)
+        queryset = queryset.filter(available=True)
+       
+        return queryset
     
 
     def post(self, request):

@@ -12,10 +12,10 @@ class Item(models.Model):
 
     quantity = models.IntegerField('Количество')
     purchase_price = models.FloatField('Стоймасть закупки')
-    sales_price = models.FloatField('Стоймасть сбыта',blank=True, null=True)
+   
     purchase_date = models.DateField('Дата поступления')
-    sales_date = models.DateField('Дата сбыта', blank=True, null=True)
-    sold = models.BooleanField('Сбыто', default = False)
+   
+   
     available = models.BooleanField('доступно', default = True)
     soldQuantity = models.IntegerField('Количество cбыто', default = 0)
     responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -35,7 +35,7 @@ class Item(models.Model):
     
     
     def __str__(self):
-        return f"{self.product} - {self.stock} - {self.quantity} - {self.purchase_price} - {self.sales_price} - {self.purchase_date} - {self.sales_date} - sold= {self.sold}  - available= {self.available} - {self.soldQuantity} - {self.responsible}"
+        return f"{self.product} - {self.stock} - {self.quantity} - {self.purchase_price} - {self.purchase_date} - available= {self.available} - {self.soldQuantity} - {self.responsible}"
     
     @classmethod
     def createSaleItem(cls, item_data, user):
@@ -47,7 +47,7 @@ class Item(models.Model):
         if item.soldQuantity == item.quantity:
             item.available = False
 
-        saleItem = cls()
+        saleItem = SalesItem()
         saleItem.product = item.product
         saleItem.stock = item.stock
         saleItem.quantity = int(item_data['quantity'])
@@ -61,12 +61,32 @@ class Item(models.Model):
         else:
             saleItem.sales_date = item_data['selectedDate']
 
-        saleItem.sold = True
-        saleItem.available = False
+        
         item.save()
         item.stock.calculation_occupancy_status()
         saleItem.responsible = user
         saleItem.save()
-        
         print('item', item)
+        
         return saleItem
+
+
+class SalesItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+
+    quantity = models.IntegerField('Количество')
+    purchase_price = models.FloatField('Стоймасть закупки')
+    sales_price = models.FloatField('Стоймасть сбыта',blank=True, null=True)
+    purchase_date = models.DateField('Дата поступления')
+    sales_date = models.DateField('Дата сбыта', blank=True, null=True)
+    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    
+    def get_absolute_url(self):
+        return reverse('item:sales_item_detail', args=[str(self.id)])
+    
+    
+    def __str__(self):
+        return f"{self.product} - {self.stock} - {self.quantity} - {self.purchase_price} - {self.sales_price} - {self.purchase_date} - {self.sales_date} - {self.responsible}"
+    

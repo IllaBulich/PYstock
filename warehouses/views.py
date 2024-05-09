@@ -35,6 +35,7 @@ class StockListView(LoginRequiredMixin, ListView):
     model = Stock
     template_name = "warehouses/main.html"
     context_object_name = "stock"
+    paginate_by = 10  
 
 
 class AddStockView(LoginRequiredMixin, CreateView):

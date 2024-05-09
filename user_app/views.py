@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.urls import reverse_lazy
-from item.models import Item
+from item.models import Item, SalesItem
 
 from user_app.forms import LoginForm, RegistrationForm, CustomPasswordResetForm, CustomSetPasswordForm, ProfileForm, UserInfoForm, UserPasswordForm
 
@@ -58,7 +58,8 @@ class UserProfileView(TemplateView):
             raise Http404("Пользователь не найден")  
         context['user_profile'] = user  
         
-        context['user_item'] = Item.objects.filter(responsible = user).order_by('-id')[:5]
+        context['user_item'] = Item.objects.filter(responsible = user).order_by('-id')[:3]
+        context['user_selt_item'] = SalesItem.objects.filter(responsible = user).order_by('-id')[:3]
         context['title'] = f'Профиль пользователя {user}'  
         return context
     
@@ -122,6 +123,32 @@ class UserItemView(ListView):
         
         return Item.objects.filter(responsible = user).order_by('-id')
          
+
+    def get_context_data(self, **kwargs):  
+        context = super().get_context_data(**kwargs)  
+        try:  
+            author = get_object_or_404(User, username=self.kwargs.get("username"))  
+        except User.DoesNotExist:  
+            raise Http404("Пользователь не найден")  
+        context['author'] = author  
+        context['title'] = f'Посты пользователя {author}'  
+        return context
+    
+
+class UserSalesItemView(ListView):
+    template_name = 'user_app/user_sales_item_page.html'  
+    context_object_name = 'items'  
+    paginate_by = 10  
+
+    def get_queryset(self): 
+        try:  
+            user = get_object_or_404(User, username=self.kwargs.get('username'))  
+        except User.DoesNotExist:  
+            raise Http404("Пользователь не найден")  
+        
+        return SalesItem.objects.filter(responsible = user).order_by('-id')
+         
+    
 
     def get_context_data(self, **kwargs):  
         context = super().get_context_data(**kwargs)  

@@ -8,8 +8,8 @@
         <thead>
             <tr>
                 <th scope="col">Название</th>
-                <th scope="col">Дата поступления</th>
-                <th scope="col">Стоймасть закупки</th>
+                <th scope="col">Дата сбыта</th>
+                <th scope="col">Стоймасть сбыта</th>
                 <th scope="col">Артикул</th>
                 <th scope="col">Количество</th>
                 
@@ -18,9 +18,9 @@
         <tbody>
             {% for el in items %}
             <tr>
-                <th><a href="{%  url 'item:item_detail' el.id %} ">{{el.product.name}}</a></th>
-                <th>{{el.purchase_date}}</th>
-                <th>{{el.purchase_price}}</th>
+                <th><a href="{%  url 'item:sales_item_detail' el.id %} ">{{el.product.name}}</a></th>
+                <th>{{el.sales_date}}</th>
+                <th>{{el.sales_price}}</th>
                 <th>{{el.product.vendor_code}}</th>
                 <th>{{el.quantity}}</th>
                 

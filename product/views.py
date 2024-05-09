@@ -29,6 +29,7 @@ class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = "product/main.html"
     context_object_name = "product"
+    paginate_by = 10  
 
 
 
