@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
@@ -6,14 +6,13 @@ from .filters import ItemFilter
 from .models import  Item, SalesItem
 from .forms import  ItemForm, QRCodeUploadForm
 from django.views.generic import DetailView,  UpdateView,  CreateView
-from django.http import JsonResponse
-import json
-import qrcode
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpResponse
 from PIL import Image
 from pyzbar.pyzbar import decode
-from django.core.paginator import Paginator
+import json
+import qrcode
+
+
 
 def upload_qr_code(request):
     if request.method == 'POST':
@@ -114,7 +113,7 @@ class ItemListView(LoginRequiredMixin,FilterView):
     model = Item
     filterset_class = ItemFilter
     template_name = 'item/sales_item.html'
-    paginate_by = 3 
+    paginate_by = 10
     context_object_name = 'item'
 
     

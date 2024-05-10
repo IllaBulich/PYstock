@@ -3,7 +3,9 @@ from item.models import Item, SalesItem
 from django.db.models import  F, ExpressionWrapper, FloatField, Sum
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
-from item.filters import ItemFilter
+from django.views.generic import TemplateView
+from item.filters import ItemFilter, SalesItemFilter
+from .forms import DateRangeForm
 import json
 
 from datetime import datetime, date
@@ -16,13 +18,13 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 class DemandForecastView(LoginRequiredMixin, FilterView):
     model = SalesItem
-    filterset_class = ItemFilter
+    filterset_class = SalesItemFilter
     template_name = 'analytics/demand_forecast.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()  # Получите исходный queryset
         # Примените фильтр, если он был отправлен в запросе
-        self.filterset = ItemFilter(self.request.GET, queryset=queryset)
+        self.filterset = SalesItemFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs  # Верните отфильтрованный queryset
 
     def get_context_data(self, **kwargs):
@@ -105,13 +107,13 @@ class DemandForecastView(LoginRequiredMixin, FilterView):
 
 class SalesView(LoginRequiredMixin, FilterView):
     model = SalesItem
-    filterset_class = ItemFilter
+    filterset_class = SalesItemFilter
     template_name = 'analytics/sales.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()  # Получите исходный queryset
         # Примените фильтр, если он был отправлен в запросе
-        self.filterset = ItemFilter(self.request.GET, queryset=queryset)
+        self.filterset = SalesItemFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs  # Верните отфильтрованный queryset
 
     def get_context_data(self, **kwargs):
@@ -124,6 +126,7 @@ class SalesView(LoginRequiredMixin, FilterView):
                 total_price=Sum(ExpressionWrapper(F('quantity') * F('sales_price'), output_field=FloatField())),
                 total_profit=Sum(ExpressionWrapper(F('quantity') * (F('sales_price') - F('purchase_price')), output_field=FloatField())),
                 total_quantity=Sum(F('quantity')),
+                
             )
             .order_by('sales_date')
         )
@@ -243,95 +246,96 @@ class FuncView(LoginRequiredMixin, FilterView):
         return context
 
 
-# class MixedView(LoginRequiredMixin, FilterView):
-#     model = Item
-#     filterset_class = ItemFilter
-#     template_name = 'analytics/mixed.html'
+class MixedView(LoginRequiredMixin, TemplateView):
+    
+   
+    template_name = 'analytics/mixed.html'
 
-#     def get_queryset(self):
-#         queryset = super().get_queryset()  # Получите исходный queryset
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = DateRangeForm(self.request.GET)
+        items = Item.objects.all()
+        sales_items = SalesItem.objects.all()
 
-#         # Примените фильтр, если он был отправлен в запросе
-#         self.filterset = ItemFilter(self.request.GET, queryset=queryset)
-#         return self.filterset.qs  # Верните отфильтрованный queryset
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         queryset = self.get_queryset()
-#         items2 = (
-#             queryset.filter(sold=False)
-#             .values('purchase_date')
-#             .annotate(
-#                 received_total_price=Sum(ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField())),
-#                 received_total_quantity =Sum(F('quantity')),
-#             )
-#             .order_by('purchase_date')
-#         )
-#         items1 = (
-#             queryset.filter(sold=True)
-#             .values('sales_date')
-#             .annotate(
-#                 sales_total_price=Sum(ExpressionWrapper(F('quantity') * F('sales_price'), output_field=FloatField())),
-#                 sales_total_quantity=Sum(F('quantity')),
-                
-#             )
-#             .order_by('sales_date')
-#         )
-        
-        
-#         # Обработка и подготовка данных
-#         data1 = {'date_list': [], 'all_sales_total_price_list': [], 'all_sales_total_quantity_list': []}
-#         for item in items1:
-        
-#             data1['date_list'].append(item['sales_date'])
-#             data1['all_sales_total_price_list'].append(item['sales_total_price'])
-#             data1['all_sales_total_quantity_list'].append(item['sales_total_quantity'])
-
-#         data2 = {'date_list': [], 'all_received_total_price_list': [], 'all_received_total_quantity_list': []}
-#         for item in items2:
-        
-#             data2['date_list'].append(item['purchase_date'])
-#             data2['all_received_total_price_list'].append(item['received_total_price'])
-#             data2['all_received_total_quantity_list'].append(item['received_total_quantity'])
-
-#         # Создание DataFrame
-#         df1 = pd.DataFrame(data1)
-#         df2 = pd.DataFrame(data2)
-
-#         # Объединение по столбцу с датой
-#         merged_df = pd.merge(df1, df2, on='date_list', how='outer')
-        
-#         merged_df['date_list'] = pd.to_datetime(merged_df['date_list'])
-#         merged_df['date_list'] = merged_df['date_list'].dt.date
-#         merged_df = merged_df.set_index('date_list')
-        
-#         # merged_df = merged_df.resample('D').sum().fillna(0)
-#         # print('merged_df2',merged_df)
-#         # Преобразование DataFrame в списки
-#         sales_date_list = merged_df.index.tolist()
-#         print('sales_date_list',sales_date_list)
-#         charts_data = dict()
-#         charts_data['cost_chart'] = dict()
-#         charts_data['cost_chart']['dades_list'] = sales_date_list
-#         charts_data['cost_chart']['series'] = [
-#             {'name': 'Сбыто в (BYN)', 'data': merged_df['all_sales_total_price_list'].tolist()},
-#             {'name': 'Поступило в (BYN)', 'data': merged_df['all_received_total_price_list'].tolist()},
-           
-#         ]
-#         charts_data['quantity_chart'] = dict()
-#         charts_data['quantity_chart']['dades_list'] = sales_date_list
-#         charts_data['quantity_chart']['series'] = [
-#             {'name': 'Сбыто', 'data': merged_df['all_sales_total_quantity_list'].tolist()},
-#             {'name': 'Поступило', 'data': merged_df['all_received_total_quantity_list'].tolist()},
+        if form.is_valid():
+            date_from = form.cleaned_data.get('date_from')
+            date_to = form.cleaned_data.get('date_to')
+            if date_from:
+                items = items.filter(purchase_date__gte=date_from)
+                sales_items = sales_items.filter(sales_date__gte=date_from)
+            if date_to:
+                items = items.filter(purchase_date__lte=date_to)
+                sales_items = sales_items.filter(sales_date__lte=date_to)
             
-#         ]
+        context['form'] = form
+        
+        sales_items = (sales_items
+                        .values('sales_date')
+                        .annotate(
+                            sales_total_price=Sum(ExpressionWrapper(F('quantity') * F('sales_price'), output_field=FloatField())), 
+                            sales_total_quantity=Sum(F('quantity')),)
+                        .order_by('sales_date'))
+        
+        items = (items
+                    .values('purchase_date')
+                    .annotate(
+                        received_total_price=Sum(ExpressionWrapper(F('quantity') * F('purchase_price'), output_field=FloatField())),
+                        received_total_quantity =Sum(F('quantity')),
+                    )
+                    .order_by('purchase_date'))
+        
+        # Обработка и подготовка данных
+        sales_items_data = {'date_list': [], 'all_sales_total_price_list': [], 'all_sales_total_quantity_list': []}
+        for item in sales_items:
+        
+            sales_items_data['date_list'].append(item['sales_date'])
+            sales_items_data['all_sales_total_price_list'].append(item['sales_total_price'])
+            sales_items_data['all_sales_total_quantity_list'].append(item['sales_total_quantity'])
 
-#         def custom_serializer(obj):
-#             if isinstance(obj, (datetime, date)):
-#                 serial = obj.isoformat()
-#                 return serial
+        items_data = {'date_list': [], 'all_received_total_price_list': [], 'all_received_total_quantity_list': []}
+        for item in items:
+        
+            items_data['date_list'].append(item['purchase_date'])
+            items_data['all_received_total_price_list'].append(item['received_total_price'])
+            items_data['all_received_total_quantity_list'].append(item['received_total_quantity'])
 
-#         json_charts_data = json.dumps(charts_data, default=custom_serializer)
+        # Создание DataFrame
+        df1 = pd.DataFrame(sales_items_data)
+        df2 = pd.DataFrame(items_data)
 
-#         context['charts_data'] = json_charts_data
-#         return context
+        # Объединение по столбцу с датой
+        merged_df = pd.merge(df1, df2, on='date_list', how='outer')
+        
+        merged_df['date_list'] = pd.to_datetime(merged_df['date_list'])
+        merged_df['date_list'] = merged_df['date_list'].dt.date
+        merged_df = merged_df.set_index('date_list')
+        
+        
+        sales_date_list = merged_df.index.tolist()
+        print('sales_date_list',sales_date_list)
+        charts_data = dict()
+        charts_data['cost_chart'] = dict()
+        charts_data['cost_chart']['dades_list'] = sales_date_list
+        charts_data['cost_chart']['series'] = [
+            {'name': 'Сбыто в (BYN)', 'data': merged_df['all_sales_total_price_list'].tolist()},
+            {'name': 'Поступило в (BYN)', 'data': merged_df['all_received_total_price_list'].tolist()},
+        
+        ]
+        charts_data['quantity_chart'] = dict()
+        charts_data['quantity_chart']['dades_list'] = sales_date_list
+        charts_data['quantity_chart']['series'] = [
+            {'name': 'Сбыто', 'data': merged_df['all_sales_total_quantity_list'].tolist()},
+            {'name': 'Поступило', 'data': merged_df['all_received_total_quantity_list'].tolist()},
+            
+        ]
+
+        def custom_serializer(obj):
+            if isinstance(obj, (datetime, date)):
+                serial = obj.isoformat()
+                return serial
+
+        json_charts_data = json.dumps(charts_data, default=custom_serializer)
+
+        context['charts_data'] = json_charts_data
+       
+        return context
