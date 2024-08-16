@@ -2,7 +2,7 @@
 Highcharts.chart('container_1', {
 
     title: {
-        text: 'Статистика сбыта',
+        text: 'Статистика поступлений',
         
     },
 

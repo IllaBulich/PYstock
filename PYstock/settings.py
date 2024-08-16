@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'item',
     'analytics',
     'googlecharts',
+    'django_extensions',
     'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,6 +63,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'PYstock.urls'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -148,3 +150,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Это регистрирует любые письма, отправленные на консоль 
 #(чтобы вы могли скопировать ссылку на сброс пароля с консоли).
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
